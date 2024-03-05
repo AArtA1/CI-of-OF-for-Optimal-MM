@@ -249,7 +249,7 @@ def plot_gain(
     # plot N exchanges
     else:
         for k, v in info.exchanges.items():
-            values_temp = [((info.orders[k][x]['price'] - info.orders[k][x-1]['price']) / info.orders[k][x-1]['price']) for x in range(left_iter-1,right_iter)]
+            values_temp = [((info.orders[k][x]['price'] - info.orders[k][x-1]['price']) / info.orders[k][x-1]['price']) for x in range(left_iter,right_iter)]
             values_temp.insert(0,0) 
             values = math.rolling(values_temp, 1)
 
