@@ -11,9 +11,9 @@ from AgentBasedModel.visualization import (
     plot_gain
 )
 from random import randint
+from pathlib import Path
 
 import random
-
 
 datasets_quantity = 10
 
@@ -28,7 +28,7 @@ price = 100
 dividend = price * risk_free_rate
 
 
-def simulate():
+def simulate() -> SimulatorInfo:
     # Initialization of stocks
     assets = [
         Stock(dividend) for _ in range(10)
@@ -62,17 +62,31 @@ def simulate():
     return info
       
 
+def collect_save_dataset(info: SimulatorInfo, iteration: int):
+    metrics = {
+        "gain": lambda:plot_gain(info, left_iter=1, right_iter=simulator_iterations),
+        "spread":lambda:plot_spread(info, left_iter=1, right_iter=simulator_iterations),
+        "obi":lambda:plot_orderbook_imbalance(info),
+        "timb":lambda:plot_trade_imbalance(info, left_iter=1, right_iter=simulator_iterations)
+    }
+
+    filepath = Path('../dataset')
+    filepath.mkdir()
+
+    for metric, func in metrics.items():
+        dataset = func()
+        dataset.to_csv(f'../dataset/{metric}_{iteration}.csv')         
 
 if __name__ == "__main__":
-
-        for i in range(datasets_quantity):
+    for i in range(datasets_quantity):
             
-            info = simulate()
+        # changing seed to generate various datasets with same parameters 
+        settings.random = randint(1, 10000)
 
+        info = simulate()
             
-            # Save generated synthetic datasets
-
-            
+        collect_save_dataset(info, i)
+        # Save generated synthetic datasets           
             
 
 plot_gain(info, left_iter=1, right_iter=500)
