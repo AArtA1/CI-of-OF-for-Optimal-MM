@@ -12,7 +12,8 @@ def plot_price(
         idx:     int   = None,
         spread:  bool  = False,
         rolling: int   = 1,
-        figsize: tuple = (6, 6)
+        figsize: tuple = (6, 6),
+        show = False
     ):
     """Lineplot stock market price
 
@@ -27,11 +28,15 @@ def plot_price(
     plt.xlabel('Iterations')
     plt.ylabel('Price')
 
+    metric = pd.DataFrame()
+
     # plot 1 exchange
     if idx is not None:
         exchange = info.exchanges[idx]
         values = math.rolling(info.prices[idx], rolling)
         iterations = range(rolling - 1, len(values) + rolling - 1)
+
+        metric = pd.DataFrame({f'{idx}':values})
         
         plt.plot(iterations, values, color='black', label=exchange.name)
 
@@ -48,10 +53,17 @@ def plot_price(
             values = math.rolling(info.prices[k], rolling)
             iterations = range(rolling - 1, len(values) + rolling - 1)
 
+            series = pd.Series(values,name = f'{k}')
+            metric = pd.concat([metric,series], axis = 1)
+
             plt.plot(iterations, values, label=v.name)
 
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
+
+    return metric
+    
 
 def plot_orderbook_imbalance(
         info:    SimulatorInfo,

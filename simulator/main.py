@@ -15,11 +15,11 @@ from pathlib import Path
 
 import random
 
-datasets_quantity = 10
+datasets_quantity = 1
 
-stocks_quantity = 10
+stocks_quantity = 2
 
-simulator_iterations = 500
+simulator_iterations = 1000
 
 risk_free_rate = 5e-4
         
@@ -29,7 +29,7 @@ dividend = price * risk_free_rate
 
 
 assets = [
-        Stock(dividend) for _ in range(10)
+        Stock(dividend) for _ in range(stocks_quantity)
     ]
 
     # Exchange agent (intermediary between market and customer)
@@ -39,8 +39,8 @@ exchanges = [
 
     # Market customers
 traders = [
-        *[Random(exchanges[randint(0, 2)])         for _ in range(20)],
-        *[Fundamentalist(exchanges[randint(0, 2)]) for _ in range(20)],
+        *[Random(exchanges[randint(0, 1)])         for _ in range(20)],
+        *[Fundamentalist(exchanges[randint(0, 1)]) for _ in range(20)],
         *[Chartist2D(exchanges)                    for _ in range(20)],
         *[MarketMaker2D(exchanges)                 for _ in range(4)]
     ]
@@ -50,7 +50,7 @@ simulator = Simulator(**{
         'assets': assets,
         'exchanges': exchanges,
         'traders': traders,
-        'events': [MarketPriceShock(0, 200, -10)]
+        #'events': [MarketPriceShock(0, 200, -10)]
     })
 
 
@@ -66,30 +66,25 @@ def simulate() -> SimulatorInfo:
 
 def collect_save_dataset(info: SimulatorInfo, iteration: int):
     metrics = {
-        "gain": lambda:plot_gain(info, left_iter=1, right_iter=simulator_iterations),
-        "spread":lambda:plot_spread(info, left_iter=1, right_iter=simulator_iterations),
-        "obi":lambda:plot_orderbook_imbalance(info),
-        "timb":lambda:plot_trade_imbalance(info, left_iter=1, right_iter=simulator_iterations)
+        "gain": lambda:plot_gain(info, left_iter=1, right_iter=simulator_iterations, show = True),
+        "spread":lambda:plot_spread(info, left_iter=1, right_iter=simulator_iterations, show = True),
+        "obi":lambda:plot_orderbook_imbalance(info, show=True),
+        "timb":lambda:plot_trade_imbalance(info, left_iter=1, right_iter=simulator_iterations, show = True),
+        "price":lambda:plot_price(info, show = True)
     }
 
     for metric, func in metrics.items():
         dataset = func()
-        dataset.to_csv(f'{metric}_{iteration}.csv')         
+        dataset.to_csv(f'dataset/{metric}_{iteration}.csv')         
 
 if __name__ == "__main__":
     for i in range(datasets_quantity):
             
-        # changing seed to generate various datasets with same parameters 
-        settings.random = randint(1, 10000)
+        # changing seed to generate various datasets with same parameters
+        # settings.random = randint(1, 10000) 
 
         info = simulate()
             
         collect_save_dataset(info, i)
         # Save generated synthetic datasets           
             
-
-plot_gain(info, left_iter=1, right_iter=500)
-
-res = plot_spread(info, left_iter=1 , right_iter=500)
-
-res.to_csv('output.csv')

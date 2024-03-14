@@ -48,7 +48,6 @@ class Simulator:
             # Capture current info
             self.info.capture()
 
-
             random.seed(settings.seed)
             
             settings.seed +=1
