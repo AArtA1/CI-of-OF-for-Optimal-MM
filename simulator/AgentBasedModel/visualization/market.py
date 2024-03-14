@@ -57,7 +57,8 @@ def plot_orderbook_imbalance(
         info:    SimulatorInfo,
         idx:     int   = None,
         rolling : int = 1,
-        figsize: tuple = (6, 6)
+        figsize: tuple = (6, 6),
+        show = False
     ):
     """Order Book Imbalance Metric
 
@@ -100,12 +101,11 @@ def plot_orderbook_imbalance(
 
     #plt.ylim([-1,1])
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
 
     return metric
     
-
-
 
 
 def plot_spread(
@@ -114,6 +114,7 @@ def plot_spread(
         left_iter : int = 1,
         right_iter : int = 1,
         figsize: tuple = (6, 6),
+        show = False
     ):
     """ Spread
     :param info: SimulatorInfo instance
@@ -154,10 +155,10 @@ def plot_spread(
             plt.plot(iterations, values, label=v.name)
 
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
 
     return metric
-
 
 
 
@@ -167,6 +168,7 @@ def plot_trade_imbalance(
         left_iter : int = 1,
         right_iter : int = 1,
         figsize: tuple = (6, 6),
+        show = False
     ):
     """Trade Flow Imbalance Metric: Volume Imbalance between bid and ask
     :param info: SimulatorInfo instance
@@ -208,7 +210,8 @@ def plot_trade_imbalance(
             plt.plot(iterations, standardized_values, label=v.name)
 
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
 
     return metric
 
@@ -219,6 +222,7 @@ def plot_gain(
         left_iter : int = 1,
         right_iter : int = 1,
         figsize: tuple = (6, 6),
+        show = False
     ):
     """Asset's Gain: 
     :param info: SimulatorInfo instance
@@ -260,7 +264,8 @@ def plot_gain(
             plt.plot(iterations, values, label=v.name)
 
     plt.legend()
-    plt.show()
+    if show:
+        plt.show()
 
     return metric
 

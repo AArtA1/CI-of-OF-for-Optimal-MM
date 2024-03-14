@@ -28,19 +28,17 @@ price = 100
 dividend = price * risk_free_rate
 
 
-def simulate() -> SimulatorInfo:
-    # Initialization of stocks
-    assets = [
+assets = [
         Stock(dividend) for _ in range(10)
     ]
 
     # Exchange agent (intermediary between market and customer)
-    exchanges = [
+exchanges = [
         ExchangeAgent(assets[i], risk_free_rate) for i in range(stocks_quantity) #for x in range(10)   # single asset
     ]
 
     # Market customers
-    traders = [
+traders = [
         *[Random(exchanges[randint(0, 2)])         for _ in range(20)],
         *[Fundamentalist(exchanges[randint(0, 2)]) for _ in range(20)],
         *[Chartist2D(exchanges)                    for _ in range(20)],
@@ -48,12 +46,16 @@ def simulate() -> SimulatorInfo:
     ]
 
     # Run simulation
-    simulator = Simulator(**{
+simulator = Simulator(**{
         'assets': assets,
         'exchanges': exchanges,
         'traders': traders,
         'events': [MarketPriceShock(0, 200, -10)]
     })
+
+
+def simulate() -> SimulatorInfo:
+    # Initialization of stocks
 
     info = simulator.info
 
@@ -70,12 +72,9 @@ def collect_save_dataset(info: SimulatorInfo, iteration: int):
         "timb":lambda:plot_trade_imbalance(info, left_iter=1, right_iter=simulator_iterations)
     }
 
-    filepath = Path('../dataset')
-    filepath.mkdir()
-
     for metric, func in metrics.items():
         dataset = func()
-        dataset.to_csv(f'../dataset/{metric}_{iteration}.csv')         
+        dataset.to_csv(f'{metric}_{iteration}.csv')         
 
 if __name__ == "__main__":
     for i in range(datasets_quantity):
