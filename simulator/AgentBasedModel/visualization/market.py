@@ -25,7 +25,7 @@ def plot_price(
     """
     plt.figure(figsize=figsize)
     plt.title('Stock Market price') if rolling == 1 else plt.title(f'Stock Price (MA {rolling})')
-    plt.xlabel('Iterations')
+    plt.xlabel('Tick')
     plt.ylabel('Price')
 
     metric = pd.DataFrame()
@@ -38,7 +38,7 @@ def plot_price(
 
         metric = pd.DataFrame({f'{idx}':values})
         
-        plt.plot(iterations, values, color='black', label=exchange.name)
+        plt.plot(iterations, values, color='blue')
 
         if spread:
             v1 = math.rolling([el['bid'] for el in info.spreads[idx]], rolling)
@@ -81,7 +81,7 @@ def plot_orderbook_imbalance(
     """
     plt.figure(figsize=figsize)
     plt.title('Order Book Imbalance')
-    plt.xlabel('Iterations')
+    plt.xlabel('Tick')
     plt.ylabel('Coefficent')
 
     print(type(info.orders[0]))
@@ -97,7 +97,7 @@ def plot_orderbook_imbalance(
         
         metric = pd.DataFrame({f'{idx}':values})
         
-        plt.plot(iterations, values, color='black', label=exchange.name)
+        plt.plot(iterations, values, color='blue')
 
     # plot N exchanges
     else:
@@ -136,7 +136,7 @@ def plot_spread(
     """
     plt.figure(figsize=figsize)
     plt.title('Spread imbalance')
-    plt.xlabel('Iterations')
+    plt.xlabel('Tick')
     plt.ylabel('Imbalance')
 
     print(type(info.orders[0]))
@@ -153,7 +153,7 @@ def plot_spread(
         metric = pd.DataFrame({f'{idx}':values})
 
         iterations = range(left_iter-1, right_iter)
-        plt.plot(iterations, values, color='black', label=exchange.name)
+        plt.plot(iterations, values, color='blue')
     # plot N exchanges
     else:
         for k, v in info.exchanges.items():
@@ -172,6 +172,65 @@ def plot_spread(
 
     return metric
 
+
+############# Deprecated #################
+# def plot_trade_imbalance(
+#         info:    SimulatorInfo,
+#         idx:     int   = None,
+#         delta:   int   = 1,
+#         rolling: int   = 1,
+#         figsize: tuple = (6, 6),
+#         show = False
+#     ):
+#     """Trade Flow Imbalance Metric: Volume Imbalance between bid and ask
+#     :param info: SimulatorInfo instance
+#     :param idx: ExchangeAgent id, defaults to None (all exchanges)
+#     :param rolling: MA applied to list, defaults to 1
+#     :param figsize: figure size, defaults to (6, 6)
+#     """
+#     plt.figure(figsize=figsize)
+#     plt.title('Trade Flow Imbalance')
+#     plt.xlabel('Tick')
+#     plt.ylabel('Imbalance, stocks volume')
+
+#     print(type(info.orders[0]))
+
+#     metric = pd.DataFrame()
+
+#     if idx is not None:
+#         exchange = info.exchanges[idx]
+#         ask_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['ask'] for x in range(len(info.orders[idx]))]
+#         bid_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['bid'] for x in range(len(info.orders[idx]))]
+        
+#         values = []
+
+#         for i in range(len(ask_volumes)):
+#             values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+
+#         iterations = range(rolling - 1, len(values) + rolling - 1)
+
+#         plt.plot(iterations, values, color='blue')
+    
+#     # plot N exchanges
+#     else:
+#         for k, v in info.exchanges.items():
+#             ask_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['ask'] for x in range(len(info.orders[k]))]
+#             bid_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['bid'] for x in range(len(info.orders[k]))]
+        
+#             values = []
+
+#             for i in range(len(ask_volumes)):
+#                 values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+
+#             iterations = range(rolling - 1, len(values) + rolling - 1)
+            
+#             plt.plot(iterations, values, label=v.name)
+
+#     plt.legend()
+#     if show:
+#         plt.show()
+
+#     return metric
 
 
 def plot_trade_imbalance(
@@ -244,7 +303,7 @@ def plot_gain(
     """
     plt.figure(figsize=figsize)
     plt.title('Asset\'s Gain')
-    plt.xlabel('Iterations')
+    plt.xlabel('Tick')
     plt.ylabel('Coefficient')
 
     print(type(info.orders[0]))
@@ -261,7 +320,7 @@ def plot_gain(
         metric = pd.DataFrame({f'{idx}':values})
 
         iterations = range(left_iter-1, right_iter)
-        plt.plot(iterations, values, color='black', label=exchange.name)
+        plt.plot(iterations, values, color='blue')
     # plot N exchanges
     else:
         for k, v in info.exchanges.items():
@@ -302,7 +361,7 @@ def plot_price_fundamental(
               'Stock Market and Fundamental price' if rolling == 1
         else f'Stock Market and Fundamental price (MA {rolling})'
     )
-    plt.xlabel('Iterations')
+    plt.xlabel('Tick')
     plt.ylabel('Price')
 
     # plot 1 exchange

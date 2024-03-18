@@ -148,8 +148,12 @@ class SimulatorInfo:
                      'bid': sum([order.qty for order in exchange.order_book['bid']]),
                      'ask': sum([order.qty for order in exchange.order_book['ask']])
                 },
+
                 'price':  exchange.price(),
-                'spread': exchange.spread()
+                
+                'spread': exchange.spread(),
+
+                'traded_volume': {'bid' : exchange.bid_volume, 'ask':exchange.ask_volume}
                 
                 # 'price mean': {
                 #     'bid': mean([order.price for order in self.exchange.order_book['bid']]),
@@ -168,6 +172,8 @@ class SimulatorInfo:
                 #     'ask': std([order.qty for order in self.exchange.order_book['ask']])
                 # }
             })
+
+            exchange.clear_traded_volume()
 
         # Trader Statistics
         for idx, trader in self.traders.items():

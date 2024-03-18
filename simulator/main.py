@@ -29,29 +29,30 @@ dividend = price * risk_free_rate
 
 
 assets = [
-        Stock(dividend) for _ in range(stocks_quantity)
-    ]
+    Stock(dividend) for _ in range(stocks_quantity)
+]
 
     # Exchange agent (intermediary between market and customer)
 exchanges = [
-        ExchangeAgent(assets[i], risk_free_rate) for i in range(stocks_quantity) #for x in range(10)   # single asset
-    ]
+    ExchangeAgent(assets[i], risk_free_rate) for i in range(stocks_quantity) #for x in range(10)   # single asset
+]
 
     # Market customers
 traders = [
-        *[Random(exchanges[randint(0, 1)])         for _ in range(20)],
-        *[Fundamentalist(exchanges[randint(0, 1)]) for _ in range(20)],
-        *[Chartist2D(exchanges)                    for _ in range(20)],
-        *[MarketMaker2D(exchanges)                 for _ in range(4)]
-    ]
+    *[Random(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(100)],
+    *[Fundamentalist(exchanges[randint(0, stocks_quantity - 1)]) for _ in range(100)],
+    *[Chartist1D(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(100)],
+    *[Chartist2D(exchanges)                    for _ in range(20)],
+    *[MarketMaker2D(exchanges)                 for _ in range(4)]
+]
 
     # Run simulation
 simulator = Simulator(**{
-        'assets': assets,
-        'exchanges': exchanges,
-        'traders': traders,
-        #'events': [MarketPriceShock(0, 200, -10)]
-    })
+    'assets': assets,
+    'exchanges': exchanges,
+    'traders': traders,
+    #'events': [MarketPriceShock(0, 200, -10)]
+})
 
 
 def simulate() -> SimulatorInfo:
@@ -66,11 +67,11 @@ def simulate() -> SimulatorInfo:
 
 def collect_save_dataset(info: SimulatorInfo, iteration: int):
     metrics = {
-        "gain": lambda:plot_gain(info, left_iter=1, right_iter=simulator_iterations, show = True),
-        "spread":lambda:plot_spread(info, left_iter=1, right_iter=simulator_iterations, show = True),
-        "obi":lambda:plot_orderbook_imbalance(info, show=True),
-        "timb":lambda:plot_trade_imbalance(info, left_iter=1, right_iter=simulator_iterations, show = True),
-        "price":lambda:plot_price(info, show = True)
+        #"gain": lambda:plot_gain(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
+        #"spread":lambda:plot_spread(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
+        #"obi":lambda:plot_orderbook_imbalance(info,idx = 1, show=True),
+        #"timb":lambda:plot_trade_imbalance(info, idx = 1, delta = 1, show = True),
+        "price":lambda:plot_price(info, idx = 1, show = True, spread=False)
     }
 
     for metric, func in metrics.items():

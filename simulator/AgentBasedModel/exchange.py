@@ -107,6 +107,9 @@ class ExchangeAgent:
         self.order_book = self.order_book = {'bid': OrderList('bid'), 'ask': OrderList('ask')}
         self._fill_book(mean, std, n)
 
+        self.ask_volume = 0.0
+        self.bid_volume = 0.0
+
         #print_book_values(self.order_book)
 
     def _fill_book(self, mean: float, std: float , n: int):
@@ -235,15 +238,23 @@ class ExchangeAgent:
         
         if order.order_type == 'bid':
             order = self.order_book['ask'].fulfill(order, t_cost)
+            self.bid_volume += order.qty
         elif order.order_type == 'ask':
             order = self.order_book['bid'].fulfill(order, t_cost)
+            self.ask_volume += order.qty
         return order
 
     def cancel_order(self, order: Order):
         if order.order_type == 'bid':
             self.order_book['bid'].remove(order)
+            self.bid_volume -= order.qty
         elif order.order_type == 'ask':
             self.order_book['ask'].remove(order)
+            self.ask_volume -= order.qty
+    
+    def clear_traded_volume(self):
+        self.ask_volume = 0.0
+        self.bid_volume = 0.0
 
 
 
