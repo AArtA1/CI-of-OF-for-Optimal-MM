@@ -140,10 +140,11 @@ class SimulatorInfo:
                     'bid' : exchange.spread_volume()['bid'],
                     'ask' : exchange.spread_volume()['ask']
                 },
-                'best_3_price_volumes' : {
-                     'bid' : exchange.spread_volume_best(5)['bid'],
-                     'ask' : exchange.spread_volume_best(5)['ask']
-                },
+                
+                'best_10_volumes' : [exchange.spread_volume_best(i+1) for i in range(10)],
+                
+                'best_3_price_volumes' : exchange.spread_volume_best(3),
+                
                 'volume_sum': {
                      'bid': sum([order.qty for order in exchange.order_book['bid']]),
                      'ask': sum([order.qty for order in exchange.order_book['ask']])

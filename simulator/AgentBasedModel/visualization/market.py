@@ -68,9 +68,10 @@ def plot_price(
 def plot_orderbook_imbalance(
         info:    SimulatorInfo,
         idx:     int   = None,
-        rolling : int = 1,
+        level:   int = 1,   
+        rolling: int = 1,
         figsize: tuple = (6, 6),
-        show = False
+        show =   False
     ):
     """Order Book Imbalance Metric
 
@@ -80,7 +81,7 @@ def plot_orderbook_imbalance(
     :param figsize: figure size, defaults to (6, 6)
     """
     plt.figure(figsize=figsize)
-    plt.title('Order Book Imbalance')
+    plt.title(f'Order Book Imbalance of {level} level')
     plt.xlabel('Tick')
     plt.ylabel('Coefficent')
 
@@ -91,7 +92,7 @@ def plot_orderbook_imbalance(
     # plot 1 exchange
     if idx is not None:
         exchange = info.exchanges[idx]
-        values_temp = math.order_book_imbalance([info.orders[idx][x]['best_3_price_volumes'] for x in range(len(info.orders[idx]))])
+        values_temp = math.order_book_imbalance([info.orders[idx][x]['best_10_volumes'][level-1] for x in range(len(info.orders[idx]))])
         values = math.rolling(values_temp, rolling)
         iterations = range(rolling - 1, len(values) + rolling - 1)
         
@@ -102,7 +103,7 @@ def plot_orderbook_imbalance(
     # plot N exchanges
     else:
         for k, v in info.exchanges.items():
-            values_temp = math.order_book_imbalance([info.orders[k][x]['best_3_price_volumes'] for x in range(len(info.orders[k]))])
+            values_temp = math.order_book_imbalance([info.orders[k][x]['best_10_volumes'][level-1] for x in range(len(info.orders[k]))])
             values = math.rolling(values_temp, rolling)
             iterations = range(rolling - 1, len(values) + rolling - 1)
 
@@ -173,12 +174,77 @@ def plot_spread(
     return metric
 
 
+def plot_trade_imbalance(
+        info:    SimulatorInfo,
+        idx:     int   = None,
+        delta:   int   = 1,
+        rolling: int   = 1,
+        figsize: tuple = (6, 6),
+        show = False
+    ):
+    """Trade Flow Imbalance Metric: Volume Imbalance between bid and ask
+    :param info: SimulatorInfo instance
+    :param idx: ExchangeAgent id, defaults to None (all exchanges)
+    :param rolling: MA applied to list, defaults to 1
+    :param figsize: figure size, defaults to (6, 6)
+    """
+    plt.figure(figsize=figsize)
+    plt.title(f'Trade Flow Imbalance with window {delta}')
+    plt.xlabel('Tick')
+    plt.ylabel('Imbalance, stocks volume')
+
+    print(type(info.orders[0]))
+
+    metric = pd.DataFrame()
+
+    if idx is not None:
+        exchange = info.exchanges[idx]
+        ask_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['ask'] for x in range(len(info.orders[idx]))]
+        bid_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['bid'] for x in range(len(info.orders[idx]))]
+        
+        values = []
+
+        for i in range(len(info.orders[idx]) + 1):
+            values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+
+
+        metric = pd.DataFrame({f'{idx}':values[1:]})
+
+        iterations = range(rolling - 1, len(values) + rolling - 1)
+
+        plt.plot(iterations, values, color='blue')
+    
+    # plot N exchanges
+    else:
+        for k, v in info.exchanges.items():
+            ask_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['ask'] for x in range(len(info.orders[k]))]
+            bid_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['bid'] for x in range(len(info.orders[k]))]
+        
+            values = []
+
+            for i in range(len(info.orders[k]) + 1):
+                values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+
+            series = pd.Series(values[1:],name = f'{k}')
+            metric = pd.concat([metric,series], axis = 1)
+
+            iterations = range(rolling - 1, len(values) + rolling - 1)
+            
+            plt.plot(iterations, values, label=v.name)
+
+    plt.legend()
+    if show:
+        plt.show()
+
+    return metric
+
+
 ############# Deprecated #################
 # def plot_trade_imbalance(
 #         info:    SimulatorInfo,
 #         idx:     int   = None,
-#         delta:   int   = 1,
-#         rolling: int   = 1,
+#         left_iter : int = 1,
+#         right_iter : int = 1,
 #         figsize: tuple = (6, 6),
 #         show = False
 #     ):
@@ -190,101 +256,42 @@ def plot_spread(
 #     """
 #     plt.figure(figsize=figsize)
 #     plt.title('Trade Flow Imbalance')
-#     plt.xlabel('Tick')
+#     plt.xlabel('Iterations')
 #     plt.ylabel('Imbalance, stocks volume')
 
 #     print(type(info.orders[0]))
 
 #     metric = pd.DataFrame()
 
+#     # plot 1 exchange
 #     if idx is not None:
 #         exchange = info.exchanges[idx]
-#         ask_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['ask'] for x in range(len(info.orders[idx]))]
-#         bid_volumes = [0 for x in range(delta)] + [info.orders[idx][x]['traded_volume']['bid'] for x in range(len(info.orders[idx]))]
-        
-#         values = []
+#         values_temp = [(info.orders[idx][x]['volume_sum']['ask'] - info.orders[idx][x]['volume_sum']['bid']) for x in range(left_iter-1,right_iter)] 
+#         values = math.rolling(values_temp, 1)
+#         standardized_values = (values - np.min(values)) / ( np.max(values) - np.min(values) )
 
-#         for i in range(len(ask_volumes)):
-#             values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+#         metric = pd.DataFrame({f'{idx}':values})
 
-#         iterations = range(rolling - 1, len(values) + rolling - 1)
-
-#         plt.plot(iterations, values, color='blue')
-    
+#         iterations = range(left_iter-1, right_iter)
+#         plt.plot(iterations, standardized_values, color='black', label=exchange.name)
 #     # plot N exchanges
 #     else:
 #         for k, v in info.exchanges.items():
-#             ask_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['ask'] for x in range(len(info.orders[k]))]
-#             bid_volumes = [0 for x in range(delta)] + [info.orders[k][x]['traded_volume']['bid'] for x in range(len(info.orders[k]))]
-        
-#             values = []
+#             values_temp = [(info.orders[k][x]['volume_sum']['ask'] - info.orders[k][x]['volume_sum']['bid']) for x in range(left_iter-1,right_iter)] 
+#             values = math.rolling(values_temp, 1)
+#             standardized_values = (values - np.min(values)) / ( np.max(values) - np.min(values) )
 
-#             for i in range(len(ask_volumes)):
-#                 values.append(sum(bid_volumes[i:i+delta + 1]) - sum(ask_volumes[i:i+delta+1]))
+#             series = pd.Series(values,name = f'{k}')
+#             metric = pd.concat([metric,series], axis = 1)
 
-#             iterations = range(rolling - 1, len(values) + rolling - 1)
-            
-#             plt.plot(iterations, values, label=v.name)
+#             iterations = range(left_iter-1,right_iter)
+#             plt.plot(iterations, standardized_values, label=v.name)
 
 #     plt.legend()
 #     if show:
 #         plt.show()
 
 #     return metric
-
-
-def plot_trade_imbalance(
-        info:    SimulatorInfo,
-        idx:     int   = None,
-        left_iter : int = 1,
-        right_iter : int = 1,
-        figsize: tuple = (6, 6),
-        show = False
-    ):
-    """Trade Flow Imbalance Metric: Volume Imbalance between bid and ask
-    :param info: SimulatorInfo instance
-    :param idx: ExchangeAgent id, defaults to None (all exchanges)
-    :param rolling: MA applied to list, defaults to 1
-    :param figsize: figure size, defaults to (6, 6)
-    """
-    plt.figure(figsize=figsize)
-    plt.title('Trade Flow Imbalance')
-    plt.xlabel('Iterations')
-    plt.ylabel('Imbalance, stocks volume')
-
-    print(type(info.orders[0]))
-
-    metric = pd.DataFrame()
-
-    # plot 1 exchange
-    if idx is not None:
-        exchange = info.exchanges[idx]
-        values_temp = [(info.orders[idx][x]['volume_sum']['ask'] - info.orders[idx][x]['volume_sum']['bid']) for x in range(left_iter-1,right_iter)] 
-        values = math.rolling(values_temp, 1)
-        standardized_values = (values - np.min(values)) / ( np.max(values) - np.min(values) )
-
-        metric = pd.DataFrame({f'{idx}':values})
-
-        iterations = range(left_iter-1, right_iter)
-        plt.plot(iterations, standardized_values, color='black', label=exchange.name)
-    # plot N exchanges
-    else:
-        for k, v in info.exchanges.items():
-            values_temp = [(info.orders[k][x]['volume_sum']['ask'] - info.orders[k][x]['volume_sum']['bid']) for x in range(left_iter-1,right_iter)] 
-            values = math.rolling(values_temp, 1)
-            standardized_values = (values - np.min(values)) / ( np.max(values) - np.min(values) )
-
-            series = pd.Series(values,name = f'{k}')
-            metric = pd.concat([metric,series], axis = 1)
-
-            iterations = range(left_iter-1,right_iter)
-            plt.plot(iterations, standardized_values, label=v.name)
-
-    plt.legend()
-    if show:
-        plt.show()
-
-    return metric
 
 
 def plot_gain(

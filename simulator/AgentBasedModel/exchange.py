@@ -223,6 +223,7 @@ class ExchangeAgent:
                 order = self.order_book['ask'].fulfill(order, t_cost)
             if order.qty > 0:
                 self.order_book['bid'].insert(order)
+            self.bid_volume += order.qty
             return
 
         elif order.order_type == 'ask':
@@ -230,6 +231,8 @@ class ExchangeAgent:
                 order = self.order_book['bid'].fulfill(order, t_cost)
             if order.qty > 0:
                 self.order_book['ask'].insert(order)
+            
+            self.ask_volume += order.qty
 
     def market_order(self, order: Order) -> Order:
         t_cost = self.transaction_cost
@@ -238,10 +241,10 @@ class ExchangeAgent:
         
         if order.order_type == 'bid':
             order = self.order_book['ask'].fulfill(order, t_cost)
-            self.bid_volume += order.qty
+            #self.bid_volume += order.qty
         elif order.order_type == 'ask':
             order = self.order_book['bid'].fulfill(order, t_cost)
-            self.ask_volume += order.qty
+            #self.ask_volume += order.qty
         return order
 
     def cancel_order(self, order: Order):

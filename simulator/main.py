@@ -19,7 +19,7 @@ datasets_quantity = 1
 
 stocks_quantity = 2
 
-simulator_iterations = 1000
+simulator_iterations = 100
 
 risk_free_rate = 5e-4
         
@@ -66,17 +66,29 @@ def simulate() -> SimulatorInfo:
       
 
 def collect_save_dataset(info: SimulatorInfo, iteration: int):
+    
     metrics = {
         #"gain": lambda:plot_gain(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
         #"spread":lambda:plot_spread(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
-        #"obi":lambda:plot_orderbook_imbalance(info,idx = 1, show=True),
-        #"timb":lambda:plot_trade_imbalance(info, idx = 1, delta = 1, show = True),
-        "price":lambda:plot_price(info, idx = 1, show = True, spread=False)
+        #"obi":lambda:plot_orderbook_imbalance(info, show=True,level = 10),
+        #"timb":lambda:plot_trade_imbalance(info, delta = 1, show = True),
+        #"obi_1":lambda:plot_orderbook_imbalance(info,show = True, level = 1),
+        #"obi_2":lambda:plot_orderbook_imbalance(info,show = True, level = 2),    
+        "price":lambda:plot_price(info, show = False, spread=False)
     }
+
+    for i in range(10):
+       metrics[f'obi_level_{i+1}'] = lambda i = i:plot_orderbook_imbalance(info,show = False, level = i+1)
+
+    for i in range(10):
+        metrics[f'tfi_delta_{i}'] = lambda i = i:plot_trade_imbalance(info,delta = i+1,show = False)
+
+    #metrics.update(obi_levels)
 
     for metric, func in metrics.items():
         dataset = func()
-        dataset.to_csv(f'dataset/{metric}_{iteration}.csv')         
+        #dataset.to_csv(f'dataset/{metric}_{iteration}.csv')         
+        dataset.to_csv(f'dataset/{metric}.csv')         
 
 if __name__ == "__main__":
     for i in range(datasets_quantity):
