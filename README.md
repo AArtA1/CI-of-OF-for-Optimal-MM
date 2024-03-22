@@ -1,10 +1,10 @@
 # Cross-Impact of Order Flow for Optimal Market-Making using ML and DL algorithms 
 
-This Git repository contains several components related to stock market analysis and machine learning (ML) / deep learning (DL) models. The main components are an `article.pdf` file presenting researched data, a `simulator` directory for generating datasets, and a `models` directory containing ML and DL models. This README provides an overview of the repository structure and instructions for using the components.
+This Git repository contains several components related to stock market analysis and machine learning (ML) / deep learning (DL) models. The main components are an `Article.pdf` file presenting researched data, a `simulator` directory for generating datasets, and a `models` directory containing ML and DL models. This README provides an overview of the repository structure and instructions for using the components.
 
 ## Components
 
-1. `article.pdf`: This file contains a detailed research article discussing various aspects of stock market data, including trends, volatility, and other metrics. It presents analyzed data and findings in a structured format for reference and further study.
+1. `Article.pdf`: This file contains a detailed research article discussing various aspects of stock market data, including trends, volatility, and other metrics. It presents analyzed data and findings in a structured format for reference and further study.
 
 2. `simulator` directory: This directory contains the code for a simulator tool that generates datasets related to stock changes and various metrics. The simulator is designed to create realistic market scenarios for research, testing, or educational purposes.
 
@@ -14,7 +14,7 @@ This Git repository contains several components related to stock market analysis
 
 ### Accessing the Research Article
 
-The `article.pdf` file can be accessed directly from the repository. You can download or view it using your preferred PDF viewer software.
+The `Article.pdf` file can be accessed directly from the repository. You can download or view it using your preferred PDF viewer software.
 
 ### Using the Simulator
 
@@ -23,3 +23,8 @@ To use the simulator tool in the `simulator` directory, follow these steps:
 1. Clone the repository to your local machine using Git:
    ```bash
    git clone https://github.com/your-username/repository-name.git
+
+
+### Ready pipeline for generating and learning models
+
+The directory models contains ipynb files of pipelines
