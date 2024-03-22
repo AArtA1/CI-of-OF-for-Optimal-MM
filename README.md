@@ -23,8 +23,8 @@ To use the simulator tool in the `simulator` directory, follow these steps:
 1. Clone the repository to your local machine using Git:
    ```bash
    git clone https://github.com/your-username/repository-name.git
-
-
+    ```
+    
 ### Ready pipeline for generating and learning models
 
 The directory models contains ipynb files of pipelines
