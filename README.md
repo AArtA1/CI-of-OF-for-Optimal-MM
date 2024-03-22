@@ -1,4 +1,4 @@
-# Git Repository Readme
+# Cross-Impact of Order Flow for Optimal Market-Making using ML and DL algorithms 
 
 This Git repository contains several components related to stock market analysis and machine learning (ML) / deep learning (DL) models. The main components are an `article.pdf` file presenting researched data, a `simulator` directory for generating datasets, and a `models` directory containing ML and DL models. This README provides an overview of the repository structure and instructions for using the components.
 
