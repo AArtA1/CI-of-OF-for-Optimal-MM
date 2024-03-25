@@ -17,9 +17,9 @@ import random
 
 datasets_quantity = 1
 
-stocks_quantity = 2
+stocks_quantity = 4
 
-simulator_iterations = 100
+simulator_iterations = 1000
 
 risk_free_rate = 5e-4
         
@@ -39,11 +39,11 @@ exchanges = [
 
     # Market customers
 traders = [
-    *[Random(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(100)],
-    *[Fundamentalist(exchanges[randint(0, stocks_quantity - 1)]) for _ in range(100)],
-    *[Chartist1D(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(100)],
-    *[Chartist2D(exchanges)                    for _ in range(20)],
-    *[MarketMaker2D(exchanges)                 for _ in range(4)]
+    *[Random(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(700)],
+    *[Fundamentalist(exchanges[randint(0, stocks_quantity - 1)]) for _ in range(700)],
+    *[Chartist1D(exchanges[randint(0, stocks_quantity - 1)])         for _ in range(700)],
+    *[Chartist2D(exchanges)                    for _ in range(200)],
+    *[MarketMaker2D(exchanges)                 for _ in range(100)]
 ]
 
     # Run simulation
@@ -71,17 +71,18 @@ def collect_save_dataset(info: SimulatorInfo, iteration: int):
         #"gain": lambda:plot_gain(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
         #"spread":lambda:plot_spread(info, idx = 1, left_iter=1, right_iter=simulator_iterations, show = True),
         #"obi":lambda:plot_orderbook_imbalance(info, show=True,level = 10),
-        #"timb":lambda:plot_trade_imbalance(info, delta = 1, show = True),
-        #"obi_1":lambda:plot_orderbook_imbalance(info,show = True, level = 1),
+        "timb":lambda:plot_trade_imbalance(info, delta = 3, show = True),
+        "obi_1":lambda:plot_orderbook_imbalance(info,show = True, level = 3),
         #"obi_2":lambda:plot_orderbook_imbalance(info,show = True, level = 2),    
-        "price":lambda:plot_price(info, show = False, spread=False)
+        "price":lambda:plot_price(info, show = True, spread=False)
     }
 
-    for i in range(10):
-       metrics[f'obi_level_{i+1}'] = lambda i = i:plot_orderbook_imbalance(info,show = False, level = i+1)
 
-    for i in range(10):
-        metrics[f'tfi_delta_{i}'] = lambda i = i:plot_trade_imbalance(info,delta = i+1,show = False)
+    # for i in range(10):
+    #    metrics[f'obi_level_{i+1}'] = lambda i = i:plot_orderbook_imbalance(info,show = True, level = i+1)
+
+    # for i in range(10):
+    #     metrics[f'tfi_delta_{i}'] = lambda i = i:plot_trade_imbalance(info,delta = i+1,show = True)
 
     #metrics.update(obi_levels)
 
